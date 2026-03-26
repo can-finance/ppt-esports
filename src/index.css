@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ppt: #C43E1C;
+  --color-ppt-dark: #A33316;
+  --color-ppt-light: #E05A38;
+  --color-ppt-bg: #121212;
+  --color-ppt-surface: #1E1E1E;
+
+  --font-sans: "Arial", sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-ppt-bg text-white font-sans antialiased;
+  }
+}
