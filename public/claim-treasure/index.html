@@ -24,7 +24,7 @@
 // ---------------------------------------------------------------------------
 // Constants & palette
 // ---------------------------------------------------------------------------
-const W = 430, H = 940;                       // logical portrait canvas
+const W = 430, H = 830;                       // logical portrait canvas
 const BG = '#f5cba6';
 const TRAY = { x: 12, y: 100, w: 406, h: 370 };
 const HILL = { x: 215, y: 500 };
@@ -1399,13 +1399,15 @@ function slotRect(i) {
   const tot = n * sw + (n - 1) * gap, x0 = 215 - tot / 2;
   return { x: x0 + i * (sw + gap), y: SLOT_Y, w: sw, h: 72 };
 }
-// Queue rows, spaced so the front row's raised handles clear the slot plates.
+// Queue rows: the front row, the one you tap, full size, with its raised handles
+// clearing the slot plates; the rows behind it smaller and closer, as a preview.
 const QX = k => 215 + (k - 1) * 108;
-const QY = r => 664 + r * 62;
+const QY = r => (r === 0 ? 664 : 670 + r * 44);
 
 function layoutJars(snap) {
   S.cols.forEach((col, k) => col.forEach((j, r) => {
-    j.tx = QX(k); j.ty = r < QUEUE_ROWS ? QY(r) : H + 60; j.tw = 70; j.th = 50; j.tlid = r === 0 ? 0.7 : 0; j.front = r === 0;
+    j.tx = QX(k); j.ty = r < QUEUE_ROWS ? QY(r) : H + 60; j.tw = r ? 52 : 70; j.th = r ? 36 : 50;
+    j.tlid = r === 0 ? 0.7 : 0; j.front = r === 0;
   }));
   S.slots.forEach((j, i) => {
     if (!j) return;
@@ -1623,7 +1625,7 @@ function drawStar(cx, cy, r) {
 }
 function drawLevelMenu() {
   ctx.fillStyle = 'rgba(60,30,15,0.5)'; ctx.fillRect(0, 0, W, H);
-  const px = 14, py = 60, pw = W - 28, ph = H - 90;
+  const px = 14, py = 30, pw = W - 28, ph = H - 50;
   ctx.fillStyle = 'rgba(80,40,10,0.25)'; rr(ctx, px, py + 8, pw, ph, 26); ctx.fill();
   ctx.fillStyle = '#fff6ea'; rr(ctx, px, py, pw, ph, 26); ctx.fill();
   text('Levels', W / 2, py + 36, 30, '#ffd23f', '#7a3d1f', 7);
@@ -1638,18 +1640,18 @@ function drawLevelMenu() {
   ctx.beginPath(); ctx.moveTo(cx - 6, cy - 6); ctx.lineTo(cx + 6, cy + 6); ctx.moveTo(cx + 6, cy - 6); ctx.lineTo(cx - 6, cy + 6); ctx.stroke();
   addButton(cx - 22, cy - 22, 44, 44, closeLevels, true);
 
-  const cols = 4, gap = 10, tw = (pw - 24 - gap * (cols - 1)) / cols, th = 132, x0 = px + 12, y0 = py + 92;
+  const cols = 4, gap = 10, tw = (pw - 24 - gap * (cols - 1)) / cols, th = 124, x0 = px + 12, y0 = py + 92;
   LEVEL_DEFS.forEach((d, i) => {
     const x = x0 + (i % cols) * (tw + gap), y = y0 + Math.floor(i / cols) * (th + gap);
     const current = !S.def.custom && i === S.levelIdx;
     ctx.fillStyle = 'rgba(120,60,20,0.12)'; rr(ctx, x, y + 3, tw, th, 14); ctx.fill();
     ctx.fillStyle = current ? '#ffe9a8' : '#fff'; rr(ctx, x, y, tw, th, 14); ctx.fill();
-    const ts = 66;
+    const ts = 62;
     ctx.imageSmoothingEnabled = false;
-    ctx.drawImage(levelThumb(d), x + (tw - ts) / 2, y + 12, ts, ts);
+    ctx.drawImage(levelThumb(d), x + (tw - ts) / 2, y + 10, ts, ts);
     ctx.imageSmoothingEnabled = true;
-    text(String(i + 1), x + tw / 2, y + 94, 16, '#7a4a2e', '', 0);
-    text(d.name, x + tw / 2, y + 114, 12, '#9a6a4e', '', 0);
+    text(String(i + 1), x + tw / 2, y + 88, 16, '#7a4a2e', '', 0);
+    text(d.name, x + tw / 2, y + 108, 12, '#9a6a4e', '', 0);
     if (results[i] === 'perfect') drawStar(x + tw - 12, y + 12, 11);
     else if (results[i] === 'extra') {
       ctx.fillStyle = '#6f7cf0'; ellipse(x + tw - 12, y + 12, 12, 12); ctx.fill();
@@ -1980,7 +1982,7 @@ function drawQueue() {
   S.cols.forEach((col, k) => {
     for (let r = Math.min(col.length - 1, QUEUE_ROWS); r >= 0; r--) drawJar(col[r]);
     if (col.length > QUEUE_ROWS) {
-      const x = QX(k) + 36, y = QY(QUEUE_ROWS - 1) + 20;
+      const x = QX(k) + 32, y = QY(QUEUE_ROWS - 1) + 14;
       ctx.fillStyle = '#7a4a2e'; rr(ctx, x - 17, y - 11, 34, 22, 11); ctx.fill();
       text(`+${col.length - QUEUE_ROWS}`, x, y, 13, '#fff', '', 0);
     }
